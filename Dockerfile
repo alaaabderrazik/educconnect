@@ -23,4 +23,5 @@ RUN php artisan config:clear
 RUN php artisan cache:clear
 RUN php artisan config:cache
 # start server (صححناها هنا)
+CMD php artisan serve --host=0.0.0.0 --port=$PORT
 CMD php -S 0.0.0.0:$PORT -t public
