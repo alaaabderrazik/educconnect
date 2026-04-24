@@ -1,21 +1,26 @@
-# Use official PHP image with extensions
-FROM php:8.3-fpm
+FROM php:8.2-cli
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip unzip git curl sqlite3
-
-# Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
-
-# Set working directory
 WORKDIR /var/www/html
 
-# Install Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# install deps
+RUN apt-get update && apt-get install -y \
+    unzip git curl libpng-dev libonig-dev libxml2-dev
+
+RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+
+# install composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# ⚠️ هنا التغيير المهم
+COPY ./laravel-app .
+
+# install laravel deps
+RUN composer install --no-dev --optimize-autoloader
+
+# fix permissions
+RUN chmod -R 775 storage bootstrap/cache
+
+# generate key (مهم!)
+RUN php artisan key:generate
+
+CMD php artisan serve --host=0.0.0.0 --port=9000 
