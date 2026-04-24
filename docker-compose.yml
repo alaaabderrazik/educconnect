@@ -1,0 +1,30 @@
+
+services:
+  laravel-app:
+    volumes:
+      - ./laravel-app:/var/www/html
+    build: .
+    container_name: laravel-app
+    working_dir: /var/www/html
+    ports:
+      - "8080:8080"
+    command: bash -c "composer install && php artisan serve --host=0.0.0.0 --port=8080"
+    depends_on:
+      - laravel-db
+
+  laravel-db:
+    image: mysql:8.0
+    container_name: laravel-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./laravel-app:/var/www/html
+
+volumes:
+  dbdata:
