@@ -19,6 +19,8 @@ RUN composer install --no-dev --optimize-autoloader
 
 # fix permissions
 RUN chmod -R 775 storage bootstrap/cache
-
+RUN php artisan config:clear
+RUN php artisan cache:clear
+RUN php artisan config:cache
 # start server (صححناها هنا)
 CMD php -S 0.0.0.0:$PORT -t public
